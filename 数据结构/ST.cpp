@@ -1,4 +1,5 @@
-// url:https://www.luogu.com.cn/problem/P3865
+// url: https://www.luogu.com.cn/problem/P3865
+// last change: modify the ceil(log2()) -> prework Logn
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -6,6 +7,7 @@ using i64 = long long;
 
 template <typename T>
 struct SparseTable {
+	vector<T> Logn;
 	vector<vector<T> > ST;
 	using func_type = function<T(const T &, const T &)>;
 	static T default_func(const T &t1, const T &t2) {
@@ -16,8 +18,12 @@ struct SparseTable {
 	SparseTable(const vector<T> &v, func_type _func = default_func) {
 		op = _func;
 		int len = v.size(), l1 = ceil(log2(len)) + 1;
+		Logn.assign(len + 1, -1); // must make idx_max >= len fot example 10-1+1=10
 		ST.assign(len, vector<T>(l1, 0));
 
+		for (int i = 1; i <= len; i++) {
+            Logn[i] = Logn[i / 2] + 1;
+        }
 		for (int i = 0; i < len; i++) {
 			ST[i][0] = v[i];
 		}
@@ -28,12 +34,9 @@ struct SparseTable {
 			}
 		}
     }
-	// 1) check here! from 0 ~ n - 1 && 2) remember in cpp log(0) is illegal
+	// 1) check here! From 0 ~ n - 1, So L --, R -- && 2) Remember in cpp log(0) is illegal
 	T query(int l, int r) { 
-		if (l == r) {
-			return ST[l][0];
-		}
-		int q = ceil(log2(r - l + 1)) - 1;
+		int q = Logn[r - l + 1];
 		return op(ST[l][q], ST[r - (1 << q) + 1][q]);
 	}
 };
