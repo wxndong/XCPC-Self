@@ -18,10 +18,10 @@ void dfs(int root, int fno) {
         fa[root][i] = fa[fa[root][i - 1]][i - 1];
     }
     
-    for (auto i : edge[root]) {
+    for (int i = 0; i < int(edge[root].size()); i++) {
         // 注意判掉父结点
-        if (i != fno) {
-            dfs(i, root);
+        if (edge[root][i] != fno) {
+            dfs(edge[root][i], root);
         }
     }
 }
