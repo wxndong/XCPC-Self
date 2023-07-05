@@ -224,3 +224,82 @@ signed main() {
 
     return 0;
 }
+
+
+/*
+    3、按深度差分
+
+    // 差分操作
+    dif代表深度的差分数组，使用sum进行存储每个节点的答案，记得回溯
+
+*/
+// special tree dif with depth
+// problem url : https://codeforces.com/problemset/problem/1076/E
+
+#include <bits/stdc++.h>
+#define debug cerr << "End This Line\n"; exit(0);
+
+using namespace std;
+using i64 = long long;
+
+constexpr int N = 3E5 + 10;
+int n, m;
+i64 dep[N], dif[N], ans[N], sum;
+vector<i64> edge[N];
+vector<pair<i64, i64> > change[N];
+
+void dfs(int root, int fno) {
+    dep[root] = dep[fno] + 1;
+
+    for (auto [down, val] : change[root]) {
+        dif[dep[root]] += val;
+        if (dep[root] + down + 1 <= n) {
+            dif[dep[root] + down + 1] -= val;
+        }
+    }
+
+    sum += dif[dep[root]], ans[root] = sum;
+    for (auto son : edge[root]) {
+        if (son != fno) {
+            dfs(son, root);
+        }
+    }
+
+    // track back
+    sum -= dif[dep[root]];
+    for (auto [down, val] : change[root]) {
+        dif[dep[root]] -= val;
+        if (dep[root] + down + 1 <= n) {
+            dif[dep[root] + down + 1] += val;
+        }
+    }
+}
+
+signed main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    cin >> n;
+    for (int i = 1; i <= n - 1; i++) {
+        i64 x, y;
+        cin >> x >> y;
+        edge[x].push_back(y);
+        edge[y].push_back(x);
+    }
+
+
+    cin >> m;
+    while (m --) {
+        i64 v, d, x;
+        cin >> v >> d >> x;
+        change[v].push_back({d, x});
+    }
+
+    dfs(1, 0);
+
+    for (int i = 1; i <= n; i++) {
+        cout << ans[i] << " \n"[i == n];
+    }
+
+    return 0;
+}
