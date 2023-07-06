@@ -3,6 +3,10 @@
     1、使用Tarjan找SCC（强连通分量）
 
 */
+
+/*
+    例题1:https://loj.ac/p/10091
+*/
 #include <bits/stdc++.h>
 #define debug cerr << "Bug This Line\n"; exit(0);
 
@@ -91,6 +95,98 @@ signed main() {
     return 0;
 }
 
+/*
+    例题2:https://vjudge.net/problem/POJ-1236
+*/
+#include <cstdio>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+const int N = 100 + 10;
+
+vector<int> edge[N];
+int dfn[N], low[N], dfncnt;
+int stk[N], in_stk[N], tp;
+int scc[N], sc;
+int sz[N];
+int in[N], out[N];
+
+void tarjan(int u) {
+    dfn[u] = low[u] = ++ dfncnt;
+    stk[++ tp] = u, in_stk[u] = 1;
+
+    for (int i = 0; i < int(edge[u].size()); i++) {
+        if (!dfn[edge[u][i]]) {
+            tarjan(edge[u][i]);
+            low[u] = min(low[u], low[edge[u][i]]);
+        } 
+        else if (in_stk[edge[u][i]]) {
+            low[u] = min(low[u], dfn[edge[u][i]]);
+        }
+    }
+
+    if (low[u] == dfn[u]) {
+        sc ++;
+        while (stk[tp] != u) {
+            scc[stk[tp]] = sc;
+            sz[sc] ++;
+            in_stk[stk[tp]] = 0;
+            tp --;
+        }
+        scc[stk[tp]] = sc;
+        sz[sc] ++;
+        in_stk[stk[tp]] = 0;
+        tp --;
+    }
+}
+
+signed main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int n;
+    cin >> n;
+
+    for (int i = 1; i <= n; i++) {
+        int to;
+        while (cin >> to && to != 0) {
+            edge[i].push_back(to);
+        }
+    }
+
+    for (int i = 1; i <= n; i++) {
+        if (!dfn[i]) {
+            tarjan(i);
+        }
+    }
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 0; j < int(edge[i].size()); j++) {
+            if (scc[i] != scc[edge[i][j]]) {
+                in[scc[edge[i][j]]] ++;
+                out[scc[i]] ++;
+            }
+        }
+    }
+
+    int res1 = 0, res2 = 0;
+    for (int i = 1; i <= sc; i++) {
+        if (in[i] == 0) res1 ++;
+        if (out[i] == 0) res2 ++;
+    }
+
+    if (sc == 1) {
+        cout << sc << "\n" << 0;
+    } else {
+        cout << res1 << "\n" << max(res1, res2); // 入读为0的联通分量的个数即为SubA的答案，SubB若让所有的联通，即需要让所有的连通分量都联通，取入度和出度为0的max
+    }
+    
+    
+    return 0;
+}
 
 /*
     2、使用Kosaraju找SCC（强连通分量）
