@@ -1,5 +1,8 @@
 // url : https://loj.ac/p/10091
+/*
+    1、使用Tarjan找SCC（强连通分量）
 
+*/
 #include <bits/stdc++.h>
 #define debug cerr << "Bug This Line\n"; exit(0);
 
@@ -84,6 +87,104 @@ signed main() {
         }
     }
     cout << ans;
+
+    return 0;
+}
+
+
+/*
+    2、使用Kosaraju找SCC（强连通分量）
+    这个似乎是useless? 先贴个只能计算联通分量个数的板子，以后真碰到了再来写
+    
+*/#include <bits/stdc++.h>
+#define debug cerr << "Bug This Line\n"; exit(0);
+
+using namespace std;
+using i64 = long long;
+
+constexpr int N = 5E4 + 10;
+
+vector<int> g[N], rg[N];
+vector<int> vs;
+int used[N], comp[N], belong[N]; // comp 表示强联通分量的编号
+int n, m;
+
+void add_edge (int from, int to) {
+    g[from].push_back(to);
+    rg[to].push_back(from);
+}
+ 
+void dfs (int u) {
+    used[u] = 1;
+    for (auto v : g[u]) {
+        if (!used[v]) {
+            dfs(v);
+        }
+    }
+    vs.push_back(u);
+}
+ 
+void rdfs (int u, int k) {
+    used[u] = 1;
+    belong[u] = k;
+    for (auto v : rg[u]) {
+        if (!used[v]) {
+            rdfs(v, k);
+        }
+    }
+}
+ 
+int scc() {
+    memset(used, 0, sizeof(used));
+    vs.clear();
+    for (int i = 1; i <= n; i++) {
+        if (!used[i]) {
+            dfs(i);
+        }
+    }
+
+    memset(used, 0, sizeof(used));
+    int k = 0;
+    for (int i = int(vs.size()) - 1; i >= 0; i--) {
+        if (!used[vs[i]]) {
+            rdfs(vs[i], k ++);
+        }
+    }
+
+    return k;
+}
+ 
+
+signed main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    cin >> n >> m;
+
+    while (m --) {
+        int u, v;
+        cin >> u >> v;
+        add_edge(u, v);
+    }
+
+    int ans = scc();
+    int source = 1, sum = 0;
+    for (int i = 1; i <= n; i++) {
+        if (belong[i] == ans - 1) { // 找到最后一个联通分量，1)为什么是最后一个联通分量？zhelibuhui2)为什么是ans - 1？ 因为k从0开始统计联通分量的个数
+            source = i;
+            sum ++;
+        }
+    }
+
+    memset(used, 0, sizeof(used));
+    rdfs(source, 1);
+
+    for (int i = 1; i <= n; i++) {
+        if (!used[i]) {
+            cout << 0; return 0;
+        }
+    }
+    cout << sum;
 
     return 0;
 }
