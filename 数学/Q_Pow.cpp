@@ -9,6 +9,7 @@ using d64 = long double;
     注意区分k和n，一般为读入时的想要得到的第k项，而这里为了防止出现歧义一般不用n
     注意N需要自己根据题目设置，即N为你设置的矩阵大小，需要根据不同的题目来更改
     每次检查N，k，MOD，以及传入时k需要减少多少(求base的多少次幂)
+    change 2023-7-14 为了安全，删除掉了所有函数中的& 
 */
 constexpr int N = 2; // N不能1e3以上，会爆... 矩阵的大小，一般稍微开大一些
 constexpr int MOD = 1E9 + 7; // 模数
@@ -18,7 +19,7 @@ struct matrix {
     matrix() {memset(x, 0, sizeof (x) ); } // 构建矩阵的同时设置成全0
 };
 
-matrix multiply(matrix &a, matrix &b, i64 mod) { // c[i][j] = a[i][k] * b[k][j];
+matrix multiply(matrix a, matrix b, i64 mod) { // c[i][j] = a[i][k] * b[k][j];
     matrix c;
     for (int i = 1; i <= N; i++) 
         for (int j = 1; j <= N; j++) 
@@ -27,7 +28,7 @@ matrix multiply(matrix &a, matrix &b, i64 mod) { // c[i][j] = a[i][k] * b[k][j];
     return c;
 }   
 
-matrix m_pow(matrix &a, i64 k, i64 mod) {
+matrix m_pow(matrix a, i64 k, i64 mod) {
     matrix ans;
     for (int i = 1; i <= N; i++) ans.x[i][i] = 1; // 构建一个单位矩阵 其中N为你设置的矩阵大小
     while (k) { // 和普通的快速幂一样
@@ -76,6 +77,7 @@ T q_pow(T a, T k) {
 // get a ^ k % p
 template <typename T>
 T q_mod(T a, T k, T p) {
+    // a %= p // 注意若a大于p, 则应该先对a%p
     T ans = 1;
     while (k) {
         if (k & 1) ans = ans * a % p;
