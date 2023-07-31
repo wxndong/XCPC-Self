@@ -36,6 +36,8 @@ struct LazySegmentTree {
     template<class T>
     void init(vector<T> init_) {
         n = init_.size() - 1; // 这个模板我设置成下标从1开始, 传进来是n + 1, 第0位也算一个, 所以n需要-1
+        // 这里n的赋值需要注意下，以后改一下板子，否则感觉容易出现传入数组为0的情况
+        assert(n >= 0);
         info.assign(4 << __lg(n), Info());
         tag.assign(4 << __lg(n), Info());
         std::function<void(int, int, int)> build = [&](int p, int l, int r) {
@@ -79,19 +81,15 @@ struct LazySegmentTree {
         pull(p);
     }
     Info rangeQuery(int p, int l, int r, int x, int y) {
-        Info res = Info();
+        if (r < x || y < l) {
+            return Info();
+        }
         if (l >= x && r <= y) {
             return info[p];
         }
         int mid = (l + r) / 2;
         push(p, l, r);
-        if (x <= mid) {
-            res += rangeQuery(2 * p, l, mid, x, y);
-        }
-        if (y > mid) {
-            res += rangeQuery(2 * p + 1, mid + 1, r, x, y);
-        }
-        return res;
+        return rangeQuery(2 * p, l, mid, x, y) + rangeQuery(2 * p + 1, mid + 1, r, x, y);
     }
 };
 
