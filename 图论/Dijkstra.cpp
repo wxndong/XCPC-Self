@@ -1,7 +1,12 @@
+/*
+    我的习惯是为了优先队列方便，先放边再放点
+*/
 #include <bits/stdc++.h>
 
 using namespace std;
 using i64 = long long;
+
+constexpr i64 inf = 1E18;
 
 signed main() {
     ios::sync_with_stdio(false);
@@ -10,29 +15,41 @@ signed main() {
     int n, m;
     cin >> n >> m;
 
-    vector<vector<pair<int, int> > > edge(n + 1);
+    vector<vector<pair<i64, int> > > adj(n + 1);
     while (m --) {
-        int u, v, w;
+        int u, v;
+        i64 w;
         cin >> u >> v >> w;
-        edge[u].push_back({w, v}); // 有向图加单边 无向图再加一条反向
+        adj[u].push_back({w, v}); // 有向图加单边 无向图再加一条反向
     }
 
-    vector<int> dist(n + 1, -1);    
-    priority_queue<pair<int, int>, vector<pair<int, int> >, greater<pair<int, int> > > q;
-    q.push({dist[1] = 0, 1});
-    while (not q.empty()) {
-        auto t = q.top();
-        q.pop();
-        auto u = t.second;
-        if (dist[u] != t.first) { // 这句话的意思其实是，没经过松弛的那些点不会再次进入
-            continue;
-        }
-        for (auto [val, v] : edge[u]) {
-            if (dist[v] == -1 || dist[v] > dist[u] + val) {
-                q.push({dist[v] = dist[u] + val, v});
+    vector<i64> dist(n + 1, inf);  
+
+    auto dijkstra = [&](int source) -> void {
+        // 千万注意边权放在pair的first!!!
+        priority_queue<pair<i64, int>, vector<pair<i64, int> >, greater<pair<i64, int> > > pq; 
+        vector<bool> vis(n + 1, false);
+        pq.push({dist[source] = 0LL, source});
+        while (!pq.empty()) {
+            // auto [dis, u] = pq.top(); // cpp17 only
+            int u = pq.top().second;
+            pq.pop();
+            if (vis[u] == true) {
+                continue;
             }
-        }
-    }    
+            vis[u] = true;
+            // for (auto [val, v] : adj[u]) { // cpp17 only
+            for (auto t : adj[u]) {
+                int v = t.second;
+                i64 val = t.first;
+                if (dist[v] > dist[u] + val) {
+                    pq.push({dist[v] = dist[u] + val, v});
+                }
+            }
+        }    
+    };
+    dijkstra(1);
+
     cout << dist[n] << "\n";
     
     return 0;

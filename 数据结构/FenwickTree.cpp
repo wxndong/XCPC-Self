@@ -8,6 +8,11 @@
     维护第k大的代码如下
     注意下，如果要在其他地方调用fen的vector的a，记得写成fen.a，否则会调用错误
     贴个测试链接：https://www.luogu.com.cn/problem/P1908
+
+    2023.8.11 update
+    观察了下，对于rangeAdd这个东西，一般都用线段树去实现，区间加树状数组需要用差分，过于麻烦
+    并且有时对于权值树状数组该模板若要处理带0的情况需要离散化，并且需要考虑离散化之前一个值可能有很多次
+    但离散化有些浪费时间，所以精简一下板子到FenwickTree(权值).cpp
 */
 #include <bits/stdc++.h>
 
@@ -18,7 +23,7 @@ template <typename T>
 struct Fenwick {
     int n;
     vector<T> a, b, origin;
-    Fenwick (int _n = 0) {
+    Fenwick(int _n = 0) {
         init(_n);
     }
     void init(int _n) {
@@ -84,7 +89,7 @@ int main() {
         return lower_bound(b.begin() + 1, b.begin() + 1 + m, x) - b.begin();
     };
 
-    Fenwick<i64> fen(m);
+    Fenwick<i64> fen(m + 1);
     i64 ans = 0;
     // 逆序枚举保证每次的i小于之前的j
     for (int j = n; j >= 1; j--) {

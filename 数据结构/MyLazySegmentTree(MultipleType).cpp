@@ -56,7 +56,7 @@ struct LazySegmentTree {
         addtag[p] = 0;
     }
     void mul(int p, int l, int r, int x, int y, const Info &v) {
-        if (l >= x && r <= y) {
+        if (x <= l && r <= y) {
             info[p] = (info[p] * v) % MOD;
             multag[p] = (multag[p] * v) % MOD;
             addtag[p] = (addtag[p] * v) % MOD;
@@ -73,7 +73,7 @@ struct LazySegmentTree {
         pull(p);
     }
     void add(int p, int l, int r, int x, int y, const Info &v) {
-        if (l >= x && r <= y) {
+        if (x <= l && r <= y) {
             addtag[p] = (addtag[p] + v) % MOD;
             info[p] = (info[p] + v * (r - l + 1)) % MOD;
             return;
@@ -92,7 +92,7 @@ struct LazySegmentTree {
         if (r < x || l > y) {
             return Info();
         }
-        if (l >= x && r <= y) {
+        if (x <= l && r <= y) {
             return info[p] % MOD;
         }
         int mid = (l + r) / 2;
