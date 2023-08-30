@@ -64,7 +64,7 @@ using namespace std;
 
 // get a ^ k 
 template <typename T>
-T q_pow(T a, T k) {
+T power(T a, T k) {
     T ans = 1;
     while (k) {
         if (k & 1) ans = ans * a;
@@ -76,8 +76,8 @@ T q_pow(T a, T k) {
 
 // get a ^ k % p
 template <typename T>
-T q_mod(T a, T k, T p) {
-    // a %= p // 注意若a大于p, 则应该先对a%p
+T power(T a, T k, T p) {
+    a %= p // 注意若a大于p, 则应该先对a%p
     T ans = 1;
     while (k) {
         if (k & 1) ans = ans * a % p;

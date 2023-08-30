@@ -65,7 +65,7 @@ struct LazySegmentTree {
         apply(2 * p + 1, mid + 1, r, tag[p]);
         tag[p] = Info();
     }
-    void modify(int p, int l, int r, int x, int y, const Info &v) {
+    void modify(int p, int l, int r, int x, int y, const Info &v) { // 这个是区间修改
         if (x <= l && r <= y) {
             apply(p, l, r, v);
             return;

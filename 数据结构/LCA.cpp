@@ -77,6 +77,114 @@ signed main() {
 
     return 0;
 }
+
+/*
+    lambda表达式写法
+    >= cpp14 only
+    // problem url : https://www.luogu.com.cn/problem/P3258
+
+*/
+    
+#include <bits/stdc++.h>
+
+using namespace std;
+using i64 = long long;
+
+constexpr i64 inf = 1E18;
+
+signed main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+
+    vector<int> a(n + 1, 0);
+
+    for (int i = 1; i <= n; i++) {
+        cin >> a[i];
+    }
+    
+    vector<vector<int> > adj(n + 1);
+
+    for (int i = 1; i <= n - 1; i++) {
+        int x, y;
+        cin >> x >> y;
+        adj[x].emplace_back(y);
+        adj[y].emplace_back(x);
+    }
+    
+    vector<array<int, 33> > f(n + 1);
+    vector<int> dep(n + 1, 0);
+    auto dfs = [&](auto self, int u, int fa) -> void {
+        f[u][0] = fa;
+        dep[u] = dep[fa] + 1;
+        for (int i = 1; i < 32; i++) {
+            f[u][i] = f[f[u][i - 1]][i - 1];
+        }
+        for (auto v : adj[u]) {
+            if (v == fa) {
+                continue;
+            }
+            self(self, v, u);
+            // cout << u << " " << v << endl;
+        }
+    };
+    dfs(dfs, 1, 0);
+
+    auto LCA = [&](int u, int v) -> int {
+        if (dep[u] < dep[v]) {
+            swap(u, v);
+        }   
+        int gap = dep[u] - dep[v];
+        for (int i = 0; gap > 0; gap >>= 1, i++) {
+            if (gap & 1) {
+                u = f[u][i];
+            }
+        }
+        if (u == v) {
+            return u;
+        }
+        for (int i = 30; i >= 0; i--) {
+            if (f[u][i] != f[v][i]) {
+                u = f[u][i];
+                v = f[v][i];
+            }
+        }
+        return f[u][0];
+    };
+
+    vector<int> ans(n + 1, 0);
+    for (int i = 1; i <= n - 1; i++) {
+        int fa = LCA(a[i], a[i + 1]);
+        ans[a[i]] ++;
+        ans[a[i + 1]] ++;
+        ans[fa] --;
+        ans[f[fa][0]] --;
+    }
+
+    auto treeSum = [&](auto self, int u, int fa) -> void {
+        for (auto v : adj[u]) {
+            if (v == fa) {
+                continue;
+            }
+            self(self, v, u);
+            ans[u] += ans[v];
+        }
+    };
+    treeSum(treeSum, 1, 0);
+
+    for (int i = 2; i <= n; i++) {
+        ans[a[i]] --;
+    }
+  
+    for (int i = 1; i <= n; i++) {
+        cout << ans[i] << "\n";
+    }
+
+    return 0;
+}
+
 /*
     2、Tarjan方法
     建立O(n) m次查询共 ~ O(n + m)
